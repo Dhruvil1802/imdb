@@ -2,18 +2,16 @@ import { useEffect, useState } from "react";
 import "./body.css";
 
 export default function Body({ filter, setFilter }) {
-  console.log("filter", filter);
   const [videos, setVideos] = useState("");
   const [year, setYear] = useState("");
   const [selectedItem, setSelectItem] = useState(null);
-  console.log("selectedItem", selectedItem);
-  console.log("year", year);
+
   var years = [];
 
   for (var i = 2025; i >= 1950; i--) {
     years.push(i);
   }
-  console.log(years);
+
   useEffect(
     function () {
       async function fetchMovies() {
@@ -23,7 +21,6 @@ export default function Body({ filter, setFilter }) {
           );
           const data = await res.json();
           setVideos(data.Search);
-          console.log(data.Search);
         } else if (filter === "movie" || filter === "series") {
           const res = await fetch(
             `https://www.omdbapi.com/?s=Summer&page=1&type=${filter}&apikey=b00bdafe`
@@ -49,21 +46,12 @@ export default function Body({ filter, setFilter }) {
     [filter, year]
   );
 
-  //   useEffect(
-  //     function () {
-  //       async
   async function fetchMovieDetails(id) {
-    console.log("hiiiiiiiiiiiiiiiiiiiiiii");
-
     const res = await fetch(`http://www.omdbapi.com/?i=${id}&apikey=b00bdafe`);
     const data = await res.json();
-    console.log(data);
+
     setSelectItem(data);
   }
-
-  //     },
-  //     [selectedItem]
-  //   );
 
   return (
     <main>
