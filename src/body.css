@@ -12,6 +12,8 @@ main {
   align-items: flex-start;
   gap: 20px;
   padding: 20px;
+  height: 100vh; /* To ensure the main section takes up the full height */
+  overflow: hidden; /* Prevent scrollbars on the main section */
 }
 
 /* Section Styling */
@@ -20,30 +22,24 @@ main section {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 45%; /* Adjust the width to control the section size */
+  width: 45%;
+  overflow: hidden; /* Prevent scrollbars inside each section */
 }
 
-/* Movie List Styling */
-main ul {
-  list-style: none;
-  padding: 0;
-}
-
-main li a {
-  text-decoration: none;
-  color: black;
-  display: block;
-  margin: 10px 0;
-  font-size: 18px;
-}
-
-main li a:hover {
-  color: #f5c518;
-}
-
-/* Filter Styling */
-.filter {
+/* Filter and Title Section */
+.filter-movie-container {
+  display: flex;
+  align-items: center;
+  gap: 350px;
   margin-bottom: 20px;
+}
+
+h2 {
+  margin: 0;
+}
+
+.filter {
+  margin: 0;
 }
 
 .filter label {
@@ -55,14 +51,130 @@ main li a:hover {
   padding: 5px;
   font-size: 16px;
   border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-/* Footer Styling */
-footer {
-  text-align: center;
+/* Vertical Movie List Styling with Scrollbar */
+.movie-list-vertical {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 400px; /* Fixed height for the movie list */
+  overflow-y: auto; /* Enables vertical scrolling */
+  margin-bottom: 20px;
+}
+
+.movie-item-vertical {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
   padding: 10px;
-  background-color: #222;
-  color: white;
-  width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-item-vertical:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.movie-poster-vertical {
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  margin-right: 20px;
+  border-radius: 8px;
+}
+
+.movie-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-details h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.movie-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Pagination Buttons */
+section > div {
+  display: flex;
+  justify-content: space-between;
   margin-top: 20px;
+}
+
+section > div button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+section > div button:hover {
+  background-color: #0056b3;
+}
+
+/* Movie Details Section */
+.movie-details-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.movie-detail-poster {
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.movie-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-info h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.movie-info p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #555;
+}
+
+.movie-info strong {
+  color: #000;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+
+  main section {
+    width: 100%;
+  }
+
+  .filter-movie-container {
+    flex-direction: column;
+    gap: 20px;
+  }
 }

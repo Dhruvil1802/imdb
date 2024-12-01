@@ -1,44 +1,156 @@
+import { useEffect, useState } from "react";
 import "./body.css";
-export default function Body() {
+
+export default function Body({ filter, setFilter }) {
+  console.log("filter", filter);
+  const [videos, setVideos] = useState("");
+  const [year, setYear] = useState("");
+  const [selectedItem, setSelectItem] = useState(null);
+  console.log("selectedItem", selectedItem);
+  console.log("year", year);
+  var years = [];
+
+  for (var i = 2025; i >= 1950; i--) {
+    years.push(i);
+  }
+  console.log(years);
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        if (filter === "movie" || (filter === "series" && year)) {
+          const res = await fetch(
+            `https://www.omdbapi.com/?s=Summer&page=1&type=${filter}&y=${year}&apikey=b00bdafe`
+          );
+          const data = await res.json();
+          setVideos(data.Search);
+          console.log(data.Search);
+        } else if (filter === "movie" || filter === "series") {
+          const res = await fetch(
+            `https://www.omdbapi.com/?s=Summer&page=1&type=${filter}&apikey=b00bdafe`
+          );
+          const data = await res.json();
+          setVideos(data.Search);
+        } else if (year) {
+          const res = await fetch(
+            `https://www.omdbapi.com/?s=Summer&page=1&y=${year}&apikey=b00bdafe`
+          );
+          const data = await res.json();
+          setVideos(data.Search);
+        } else {
+          const res = await fetch(
+            `https://www.omdbapi.com/?s=Summer&page=1&y=2000&apikey=b00bdafe`
+          );
+          const data = await res.json();
+          setVideos(data.Search);
+        }
+      }
+      fetchMovies();
+    },
+    [filter, year]
+  );
+
+  //   useEffect(
+  //     function () {
+  //       async
+  async function fetchMovieDetails(id) {
+    console.log("hiiiiiiiiiiiiiiiiiiiiiii");
+
+    const res = await fetch(`http://www.omdbapi.com/?i=${id}&apikey=b00bdafe`);
+    const data = await res.json();
+    console.log(data);
+    setSelectItem(data);
+  }
+
+  //     },
+  //     [selectedItem]
+  //   );
+
   return (
     <main>
       <section>
-        <h2>Movies List</h2>
-        <div class="filter">
-          <label for="year">Select Year:</label>
-          <select id="year" name="year">
-            <option value="">All Years</option>
-            <option value="2020">2020</option>
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-          </select>
+        <div class="filter-movie-container">
+          {/* <!-- Title: Movies List --> */}
+          <h2>Movies List</h2>
+
+          {/* <!-- Year Filter Dropdown --> */}
+          <div class="filter">
+            <label for="year">Select Year:</label>
+            <select name="year" onChange={(e) => setYear(e.target.value)}>
+              <option value="">All Years</option>
+              {years.map((year) => (
+                <option value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        <ul>
-          <li>
-            <a href="#">Movie 1</a>
-          </li>
-          <li>
-            <a href="#">Movie 2</a>
-          </li>
-          <li>
-            <a href="#">Movie 3</a>
-          </li>
-          <li>
-            <a href="#">Movie 4</a>
-          </li>
+
+        {/* <!-- Movie List (below the title and filter) --> */}
+        <ul className="movie-list-vertical">
+          {videos && videos.length > 0 ? (
+            videos.map((video) => (
+              <li
+                key={video.imdbID}
+                className="movie-item-vertical"
+                onClick={() => fetchMovieDetails(video.imdbID)}
+              >
+                <img
+                  src={video.Poster}
+                  alt={video.Title}
+                  className="movie-poster-vertical"
+                />
+                <div className="movie-details">
+                  <h3>{video.Title}</h3>
+                  <p>
+                    {video.Type} ({video.Year})
+                  </p>
+                </div>
+              </li>
+            ))
+          ) : (
+            <p>No movies found.</p>
+          )}
         </ul>
+
         <div>
           <button>Previous</button>
           <button>Next</button>
         </div>
       </section>
+
       <section>
         <h2>Movie Details</h2>
-        <div>
+        {selectedItem ? (
+          <div className="movie-details-container">
+            <img
+              src={selectedItem.Poster}
+              alt={`${selectedItem.Title} Poster`}
+              className="movie-detail-poster"
+            />
+            <div className="movie-info">
+              <h3>{selectedItem.Title}</h3>
+              <p>
+                <strong>Genre:</strong> {selectedItem.Genre || "N/A"}
+              </p>
+              <p>
+                <strong>Actors:</strong> {selectedItem.Actors || "N/A"}
+              </p>
+              <p>
+                <strong>Language:</strong> {selectedItem.Language || "N/A"}
+              </p>
+              <p>
+                <strong>Released:</strong> {selectedItem.Released || "N/A"}
+              </p>
+              <p>
+                <strong>Plot:</strong> {selectedItem.Plot || "N/A"}
+              </p>
+              <p>
+                <strong>IMDB Rating:</strong> {selectedItem.imdbRating || "N/A"}
+              </p>
+            </div>
+          </div>
+        ) : (
           <p>Select a movie to see details here.</p>
-        </div>
+        )}
       </section>
     </main>
   );

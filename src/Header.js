@@ -1,5 +1,5 @@
 import "./header.css";
-export default function Header() {
+export default function Header({ filter, setFilter }) {
   return (
     <>
       <nav>
@@ -9,10 +9,14 @@ export default function Header() {
             <a href="#">Home</a>
           </li>
           <li>
-            <a href="#">Movies</a>
+            <a href="#" onClick={() => setFilter("movie")}>
+              Movies
+            </a>
           </li>
           <li>
-            <a href="#">TV Shows</a>
+            <a href="#" onClick={() => setFilter("series")}>
+              TV Shows
+            </a>
           </li>
           <li>
             <a href="#">Favourites</a>
