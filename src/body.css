@@ -1,0 +1,68 @@
+/* General Reset */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* Main Content Styling */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Section Styling */
+main section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 45%; /* Adjust the width to control the section size */
+}
+
+/* Movie List Styling */
+main ul {
+  list-style: none;
+  padding: 0;
+}
+
+main li a {
+  text-decoration: none;
+  color: black;
+  display: block;
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+main li a:hover {
+  color: #f5c518;
+}
+
+/* Filter Styling */
+.filter {
+  margin-bottom: 20px;
+}
+
+.filter label {
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.filter select {
+  padding: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+/* Footer Styling */
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #222;
+  color: white;
+  width: 100%;
+  margin-top: 20px;
+}
