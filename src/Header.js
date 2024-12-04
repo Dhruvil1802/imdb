@@ -1,5 +1,5 @@
 import "./header.css";
-export default function Header({ filter, setFilter }) {
+export default function Header({ setFilter, setSearch }) {
   return (
     <>
       <nav>
@@ -26,6 +26,7 @@ export default function Header({ filter, setFilter }) {
           type="search"
           name="search"
           placeholder="Search movies or TV shows"
+          onChange={(e) => setSearch(e.target.value)}
         />
       </nav>
     </>

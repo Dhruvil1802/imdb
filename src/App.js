@@ -5,10 +5,12 @@ import Body from "./Body";
 
 function App() {
   const [filter, setFilter] = useState("");
+  const [search, setSearch] = useState("");
+
   return (
     <div>
-      <Header filter={filter} setFilter={setFilter}></Header>
-      <Body filter={filter} setFilter={setFilter}></Body>
+      <Header setFilter={setFilter} setSearch={setSearch}></Header>
+      <Body filter={filter} search={search}></Body>
     </div>
   );
 }
