@@ -10,7 +10,7 @@ export default function Body({ filter, search }) {
   const [page, setPage] = useState(1);
   const [rating, setRating] = useState(0);
   const [selectedepisode, setselectEpisode] = useState(null);
-  console.log(selectedepisode);
+
   var years = [];
   var stars = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   for (var i = 2025; i >= 1950; i--) {
@@ -80,7 +80,6 @@ export default function Body({ filter, search }) {
     setSelectSeason(data);
   }
   async function fetchEpisodeDetails(season, episode, title) {
-    console.log("this", season, episode, title);
     const res = await fetch(
       `https://www.omdbapi.com/?t=${title}&Season=${season}&Episode=${episode.Episode}&apikey=b00bdafe`
     );
@@ -92,194 +91,275 @@ export default function Body({ filter, search }) {
   return (
     <main>
       <section>
-        <div className="filter-movie-container">
-          <h2>Movies List</h2>
+        <YearFilter setYear={setYear} years={years} />
+        <MovieList videos={videos} fetchMovieDetails={fetchMovieDetails} />
 
-          <div className="filter">
-            <label for="year">Select Year:</label>
-            <select name="year" onChange={(e) => setYear(e.target.value)}>
-              <option value="">All Years</option>
-              {years.map((year) => (
-                <option value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <ul className="movie-list-vertical">
-          {videos && videos.length > 0 ? (
-            videos.map((video) => (
-              <li
-                key={video.imdbID}
-                className="movie-item-vertical"
-                onClick={() => fetchMovieDetails(video.imdbID)}
-              >
-                <img
-                  src={video.Poster}
-                  alt={video.Title}
-                  className="movie-poster-vertical"
-                />
-                <div className="movie-details">
-                  <h3>{video.Title}</h3>
-                  <p>
-                    {video.Type} ({video.Year})
-                  </p>
-                </div>
-              </li>
-            ))
-          ) : (
-            <p>No movies found.</p>
-          )}
-        </ul>
-
-        <div>
-          <button onClick={() => setPage((page) => page - 1)}>Previous</button>
-
-          <button onClick={() => setPage((page) => page + 1)}>Next</button>
-        </div>
+        <Paginations setPage={setPage} />
       </section>
-
       <section>
-        <h2>Movie Details</h2>
-        {selectedItem ? (
-          <div className="movie-details-container">
-            <div className="movie-header">
-              <div className="movie-left">
-                <img
-                  src={selectedItem.Poster}
-                  alt={`${selectedItem.Title} Poster`}
-                  className="movie-detail-poster"
-                />
-                <button className="add-to-favourite">Add to Favourites</button>
-              </div>
-              <div className="movie-info">
-                <h3>{selectedItem.Title}</h3>
-                <p>
-                  <b>Genre:</b> {selectedItem.Genre || "N/A"}
-                </p>
-                <p>
-                  <b>Actors:</b> {selectedItem.Actors || "N/A"}
-                </p>
-                <p>
-                  <b>Language:</b> {selectedItem.Language || "N/A"}
-                </p>
-                <p>
-                  <b>Released:</b> {selectedItem.Released || "N/A"}
-                </p>
-                <p>
-                  <b>Plot:</b> {selectedItem.Plot || "N/A"}
-                </p>
-                <p>
-                  <b>IMDB Rating:</b> {selectedItem.imdbRating || "N/A"}
-                </p>
-                <p>
-                  <b>Your Rating:</b>
-                  {stars.map((i) => (
-                    <span className="star" onClick={() => setRating(i + 1)}>
-                      {i < rating ? "★" : "☆"}
-                    </span>
-                  ))}
-                </p>
-              </div>
-            </div>
-            {selectedItem.Type === "series" ? (
-              <div className="seasons-container">
-                <h3>Seasons</h3>
-                <div className="season-sections">
-                  {seasons.map((index) => (
-                    <div key={index} className="season-section">
-                      <h4
-                        onClick={() =>
-                          fetchSeasonSeries(selectedItem.imdbID, index + 1)
-                        }
-                        style={{ cursor: "pointer" }}
-                      >
-                        Season {index + 1}
-                      </h4>
-                      {selectedSeason &&
-                        selectedSeason.Season === String(index + 1) && (
-                          <div className="parent-episode">
-                            <div className="episodes">
-                              <ul className="episode-list">
-                                {selectedSeason.Episodes.map((episode, i) => (
-                                  <li
-                                    key={episode.imdbID}
-                                    className="episode-item"
-                                    onClick={() =>
-                                      fetchEpisodeDetails(
-                                        index + 1,
-                                        episode,
-                                        selectedItem.Title
-                                      )
-                                    }
-                                  >
-                                    <p>
-                                      <b>Episode:</b> {i + 1}
-                                    </p>
-                                    <p>
-                                      <b>Title:</b> {episode.Title}
-                                    </p>
-                                    <p>
-                                      <b>Released:</b>{" "}
-                                      {episode.Released || "N/A"}
-                                    </p>
-                                    <p>
-                                      <b>IMDB Rating:</b>{" "}
-                                      {episode.imdbRating || "N/A"}
-                                    </p>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            <div className="episode-details">
-                              {selectedepisode ? (
-                                <div>
-                                  <h3>{selectedepisode.Title}</h3>
-                                  <p>
-                                    <b>Episode:</b> {selectedepisode.Episode}
-                                  </p>
-                                  <p>
-                                    <b>Released:</b>{" "}
-                                    {selectedepisode.Released || "N/A"}
-                                  </p>
-                                  <p>
-                                    <b>Duration:</b>{" "}
-                                    {selectedepisode.Runtime || "N/A"}
-                                  </p>
-                                  <p>
-                                    <b>Genre:</b>{" "}
-                                    {selectedepisode.Genre || "N/A"}
-                                  </p>
-                                  <p>
-                                    <b>Plot:</b> {selectedepisode.Plot || "N/A"}
-                                  </p>
-                                  <p>
-                                    <b>IMDB Rating:</b>{" "}
-                                    {selectedepisode.imdbRating || "N/A"}
-                                  </p>
-                                  <p>
-                                    <b>Actors:</b>{" "}
-                                    {selectedepisode.Actors || "N/A"}
-                                  </p>
-                                </div>
-                              ) : (
-                                <p>Select an episode to see details here.</p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
-        ) : (
-          <p>Select a movie to see details here.</p>
-        )}
+        <MovieDetails
+          selectedItem={selectedItem}
+          seasons={seasons}
+          fetchSeasonSeries={fetchSeasonSeries}
+          selectedSeason={selectedSeason}
+          fetchEpisodeDetails={fetchEpisodeDetails}
+          selectedepisode={selectedepisode}
+          stars={stars}
+          setRating={setRating}
+          rating={rating}
+        />
       </section>
     </main>
+  );
+}
+function MovieList({ videos, fetchMovieDetails }) {
+  return (
+    <>
+      <ul className="movie-list-vertical">
+        {videos && videos.length > 0 ? (
+          videos.map((video) => (
+            <li
+              key={video.imdbID}
+              className="movie-item-vertical"
+              onClick={() => fetchMovieDetails(video.imdbID)}
+            >
+              <img
+                src={video.Poster}
+                alt={video.Title}
+                className="movie-poster-vertical"
+              />
+              <div className="movie-details">
+                <h3>{video.Title}</h3>
+                <p>
+                  {video.Type} ({video.Year})
+                </p>
+              </div>
+            </li>
+          ))
+        ) : (
+          <p>No movies found.</p>
+        )}
+      </ul>
+    </>
+  );
+}
+function YearFilter({ setYear, years }) {
+  return (
+    <>
+      <div className="filter-movie-container">
+        <h2>Movies List</h2>
+
+        <div className="filter">
+          <label for="year">Select Year:</label>
+          <select name="year" onChange={(e) => setYear(e.target.value)}>
+            <option value="">All Years</option>
+            {years.map((year) => (
+              <option value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </>
+  );
+}
+function Paginations({ setPage }) {
+  return (
+    <>
+      <div>
+        <button onClick={() => setPage((page) => page - 1)}>Previous</button>
+
+        <button onClick={() => setPage((page) => page + 1)}>Next</button>
+      </div>
+    </>
+  );
+}
+function EpisodeDetails({ selectedepisode }) {
+  return (
+    <div className="episode-details">
+      {selectedepisode ? (
+        <div>
+          <h3>{selectedepisode.Title}</h3>
+          <p>
+            <b>Episode:</b> {selectedepisode.Episode}
+          </p>
+          <p>
+            <b>Released:</b> {selectedepisode.Released || "N/A"}
+          </p>
+          <p>
+            <b>Duration:</b> {selectedepisode.Runtime || "N/A"}
+          </p>
+          <p>
+            <b>Genre:</b> {selectedepisode.Genre || "N/A"}
+          </p>
+          <p>
+            <b>Plot:</b> {selectedepisode.Plot || "N/A"}
+          </p>
+          <p>
+            <b>IMDB Rating:</b> {selectedepisode.imdbRating || "N/A"}
+          </p>
+          <p>
+            <b>Actors:</b> {selectedepisode.Actors || "N/A"}
+          </p>
+        </div>
+      ) : (
+        <p>Select an episode to see details here.</p>
+      )}
+    </div>
+  );
+}
+
+function EpisodeList({
+  selectedSeason,
+  selectedItem,
+  fetchEpisodeDetails,
+  index,
+}) {
+  return (
+    <div className="episodes">
+      <ul className="episode-list">
+        {selectedSeason.Episodes.map((episode, i) => (
+          <li
+            key={episode.imdbID}
+            className="episode-item"
+            onClick={() =>
+              fetchEpisodeDetails(index + 1, episode, selectedItem.Title)
+            }
+          >
+            <p>
+              <b>Episode:</b> {i + 1}
+            </p>
+            <p>
+              <b>Title:</b> {episode.Title}
+            </p>
+            <p>
+              <b>Released:</b> {episode.Released || "N/A"}
+            </p>
+            <p>
+              <b>IMDB Rating:</b> {episode.imdbRating || "N/A"}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SeasonList({
+  selectedItem,
+  seasons,
+  fetchSeasonSeries,
+  selectedSeason,
+  fetchEpisodeDetails,
+  selectedepisode,
+}) {
+  return (
+    <>
+      {selectedItem.Type === "series" ? (
+        <div className="seasons-container">
+          <h3>Seasons</h3>
+          <div className="season-sections">
+            {seasons.map((index) => (
+              <div key={index} className="season-section">
+                <h4
+                  onClick={() =>
+                    fetchSeasonSeries(selectedItem.imdbID, index + 1)
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  Season {index + 1}
+                </h4>
+                {selectedSeason &&
+                  selectedSeason.Season === String(index + 1) && (
+                    <div className="parent-episode">
+                      <EpisodeList
+                        selectedSeason={selectedSeason}
+                        selectedItem={selectedItem}
+                        fetchEpisodeDetails={fetchEpisodeDetails}
+                        index={index}
+                      />
+
+                      <EpisodeDetails selectedepisode={selectedepisode} />
+                    </div>
+                  )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+    </>
+  );
+}
+
+function MovieDetails({
+  selectedItem,
+  stars,
+  setRating,
+  rating,
+  seasons,
+  fetchSeasonSeries,
+  selectedSeason,
+  fetchEpisodeDetails,
+  selectedepisode,
+}) {
+  return (
+    <>
+      <h2>Movie Details</h2>
+
+      {selectedItem ? (
+        <div className="movie-details-container">
+          <div className="movie-header">
+            <div className="movie-left">
+              <img
+                src={selectedItem.Poster}
+                alt={`${selectedItem.Title} Poster`}
+                className="movie-detail-poster"
+              />
+              <button className="add-to-favourite">Add to Favourites</button>
+            </div>
+            <div className="movie-info">
+              <h3>{selectedItem.Title}</h3>
+              <p>
+                <b>Genre:</b> {selectedItem.Genre || "N/A"}
+              </p>
+              <p>
+                <b>Actors:</b> {selectedItem.Actors || "N/A"}
+              </p>
+              <p>
+                <b>Language:</b> {selectedItem.Language || "N/A"}
+              </p>
+              <p>
+                <b>Released:</b> {selectedItem.Released || "N/A"}
+              </p>
+              <p>
+                <b>Plot:</b> {selectedItem.Plot || "N/A"}
+              </p>
+              <p>
+                <b>IMDB Rating:</b> {selectedItem.imdbRating || "N/A"}
+              </p>
+              <p>
+                <b>Your Rating:</b>
+                {stars.map((i) => (
+                  <span className="star" onClick={() => setRating(i + 1)}>
+                    {i < rating ? "★" : "☆"}
+                  </span>
+                ))}
+              </p>
+            </div>
+          </div>
+          <SeasonList
+            selectedItem={selectedItem}
+            seasons={seasons}
+            fetchSeasonSeries={fetchSeasonSeries}
+            selectedSeason={selectedSeason}
+            fetchEpisodeDetails={fetchEpisodeDetails}
+            selectedepisode={selectedepisode}
+          />
+        </div>
+      ) : (
+        <p>Select a movie to see details here.</p>
+      )}
+    </>
   );
 }
