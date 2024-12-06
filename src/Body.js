@@ -7,11 +7,12 @@ export default function Body({ filter, search }) {
   const [selectedItem, setSelectItem] = useState(null);
   const [selectedSeason, setSelectSeason] = useState(null);
   const [seasons, setSeasons] = useState([]);
-  const [openSeason, setOpenSeasons] = useState(false);
   const [page, setPage] = useState(1);
-
+  const [rating, setRating] = useState(0);
+  const [selectedepisode, setselectEpisode] = useState(null);
+  console.log(selectedepisode);
   var years = [];
-
+  var stars = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   for (var i = 2025; i >= 1950; i--) {
     years.push(i);
   }
@@ -78,6 +79,15 @@ export default function Body({ filter, search }) {
 
     setSelectSeason(data);
   }
+  async function fetchEpisodeDetails(season, episode, title) {
+    console.log("this", season, episode, title);
+    const res = await fetch(
+      `https://www.omdbapi.com/?t=${title}&Season=${season}&Episode=${episode.Episode}&apikey=b00bdafe`
+    );
+    const data = await res.json();
+
+    setselectEpisode(data);
+  }
 
   return (
     <main>
@@ -124,6 +134,7 @@ export default function Body({ filter, search }) {
 
         <div>
           <button onClick={() => setPage((page) => page - 1)}>Previous</button>
+
           <button onClick={() => setPage((page) => page + 1)}>Next</button>
         </div>
       </section>
@@ -133,11 +144,14 @@ export default function Body({ filter, search }) {
         {selectedItem ? (
           <div className="movie-details-container">
             <div className="movie-header">
-              <img
-                src={selectedItem.Poster}
-                alt={`${selectedItem.Title} Poster`}
-                className="movie-detail-poster"
-              />
+              <div className="movie-left">
+                <img
+                  src={selectedItem.Poster}
+                  alt={`${selectedItem.Title} Poster`}
+                  className="movie-detail-poster"
+                />
+                <button className="add-to-favourite">Add to Favourites</button>
+              </div>
               <div className="movie-info">
                 <h3>{selectedItem.Title}</h3>
                 <p>
@@ -158,10 +172,14 @@ export default function Body({ filter, search }) {
                 <p>
                   <b>IMDB Rating:</b> {selectedItem.imdbRating || "N/A"}
                 </p>
-
-                <button className="add-to-favourite-button">
-                  Add to Favourites
-                </button>
+                <p>
+                  <b>Your Rating:</b>
+                  {stars.map((i) => (
+                    <span className="star" onClick={() => setRating(i + 1)}>
+                      {i < rating ? "★" : "☆"}
+                    </span>
+                  ))}
+                </p>
               </div>
             </div>
             {selectedItem.Type === "series" ? (
@@ -180,25 +198,75 @@ export default function Body({ filter, search }) {
                       </h4>
                       {selectedSeason &&
                         selectedSeason.Season === String(index + 1) && (
-                          <ul className="episode-list">
-                            {selectedSeason.Episodes.map((episode, i) => (
-                              <li key={episode.imdbID} className="episode-item">
-                                <p>
-                                  <b>Episode:</b> {i + 1}
-                                </p>
-                                <p>
-                                  <b>Title:</b> {episode.Title}
-                                </p>
-                                <p>
-                                  <b>Released:</b> {episode.Released || "N/A"}
-                                </p>
-                                <p>
-                                  <b>IMDB Rating:</b>{" "}
-                                  {episode.imdbRating || "N/A"}
-                                </p>
-                              </li>
-                            ))}
-                          </ul>
+                          <div className="parent-episode">
+                            <div className="episodes">
+                              <ul className="episode-list">
+                                {selectedSeason.Episodes.map((episode, i) => (
+                                  <li
+                                    key={episode.imdbID}
+                                    className="episode-item"
+                                    onClick={() =>
+                                      fetchEpisodeDetails(
+                                        index + 1,
+                                        episode,
+                                        selectedItem.Title
+                                      )
+                                    }
+                                  >
+                                    <p>
+                                      <b>Episode:</b> {i + 1}
+                                    </p>
+                                    <p>
+                                      <b>Title:</b> {episode.Title}
+                                    </p>
+                                    <p>
+                                      <b>Released:</b>{" "}
+                                      {episode.Released || "N/A"}
+                                    </p>
+                                    <p>
+                                      <b>IMDB Rating:</b>{" "}
+                                      {episode.imdbRating || "N/A"}
+                                    </p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div className="episode-details">
+                              {selectedepisode ? (
+                                <div>
+                                  <h3>{selectedepisode.Title}</h3>
+                                  <p>
+                                    <b>Episode:</b> {selectedepisode.Episode}
+                                  </p>
+                                  <p>
+                                    <b>Released:</b>{" "}
+                                    {selectedepisode.Released || "N/A"}
+                                  </p>
+                                  <p>
+                                    <b>Duration:</b>{" "}
+                                    {selectedepisode.Runtime || "N/A"}
+                                  </p>
+                                  <p>
+                                    <b>Genre:</b>{" "}
+                                    {selectedepisode.Genre || "N/A"}
+                                  </p>
+                                  <p>
+                                    <b>Plot:</b> {selectedepisode.Plot || "N/A"}
+                                  </p>
+                                  <p>
+                                    <b>IMDB Rating:</b>{" "}
+                                    {selectedepisode.imdbRating || "N/A"}
+                                  </p>
+                                  <p>
+                                    <b>Actors:</b>{" "}
+                                    {selectedepisode.Actors || "N/A"}
+                                  </p>
+                                </div>
+                              ) : (
+                                <p>Select an episode to see details here.</p>
+                              )}
+                            </div>
+                          </div>
                         )}
                     </div>
                   ))}
