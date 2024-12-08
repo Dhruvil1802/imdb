@@ -276,21 +276,36 @@ section > div button:hover {
 }
 
 .episode-details {
-  width: 60%; /* Keeps the same width for the episode details */
-  height: 400px; /* Fixed height for the episode details */
-  overflow-y: auto; /* Allows scrolling if content overflows */
-  padding: 10px;
-  box-sizing: border-box; /* Ensures padding doesn't affect total width/height */
+  width: 60%; /* Maintains the section width */
+  height: 400px; /* Fixed height for the section */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 20px; /* Adds comfortable padding */
+
+  margin-top: 15px;
+  background: linear-gradient(
+    to bottom,
+    #ffffff,
+    #f4f4f4
+  ); /* Subtle gradient for depth */
+  border-radius: 8px; /* Rounded corners for a softer look */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for elevation */
+  border: 1px solid #ddd; /* Light border for a defined boundary */
 }
 
 .episode-details h3 {
-  font-size: 20px;
+  font-size: 22px; /* Slightly larger and bold font for the title */
   font-weight: bold;
+  color: #333; /* Darker color for better readability */
   margin-bottom: 10px;
+  border-bottom: 2px solid #ccc; /* Underline to separate title */
+  padding-bottom: 5px;
 }
 
 .episode-details p {
-  margin: 5px 0;
+  margin: 10px 0; /* Adds spacing between paragraphs */
+  font-size: 15px; /* Slightly larger font for easy readability */
+  color: #555; /* Neutral gray for text */
+  line-height: 1.6; /* Improves text readability */
 }
 
 .episode-stars {
@@ -301,6 +316,9 @@ section > div button:hover {
   font-size: 30px; /* Change this value as needed */
   color: gold;
   cursor: pointer;
+}
+.star:hover {
+  transform: scale(1.2); /* Slightly enlarges stars on hover */
 }
 
 /* Responsive Design */
