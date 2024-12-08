@@ -1,12 +1,14 @@
 import "./header.css";
-export default function Header({ setFilter, setSearch }) {
+export default function Header({ setFilter, setSearch, setFavOpen }) {
   return (
     <>
       <nav>
         <h1>IMDb</h1>
         <ul>
           <li>
-            <a href="#">Home</a>
+            <a href="#" onClick={() => setFavOpen(false)}>
+              Home
+            </a>
           </li>
           <li>
             <a href="#" onClick={() => setFilter("movie")}>
@@ -19,7 +21,9 @@ export default function Header({ setFilter, setSearch }) {
             </a>
           </li>
           <li>
-            <a href="#">Favourites</a>
+            <a href="#" onClick={() => setFavOpen(true)}>
+              Favourites
+            </a>
           </li>
         </ul>
         <input

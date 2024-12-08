@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./body.css";
 
-export default function Body({ filter, search }) {
+export default function Body({ filter, search, favOpen, homeOpen }) {
   const [videos, setVideos] = useState("");
   const [year, setYear] = useState("");
   const [selectedItem, setSelectItem] = useState(null);
@@ -10,6 +10,7 @@ export default function Body({ filter, search }) {
   const [page, setPage] = useState(1);
   const [rating, setRating] = useState(0);
   const [selectedepisode, setselectEpisode] = useState(null);
+  const [favourite, setFavourite] = useState([]);
 
   var years = [];
   var stars = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -33,7 +34,18 @@ export default function Body({ filter, search }) {
 
   useEffect(() => {
     async function fetchMovies() {
-      if (filter === "movie" || (filter === "series" && year)) {
+      if (favOpen) {
+        console.log("favopen", favOpen);
+        const favMovies = [];
+        for (let i = 0; i < favourite.length; i++) {
+          const res = await fetch(
+            `http://www.omdbapi.com/?i=${favourite[i]}&apikey=b00bdafe`
+          );
+          const data = await res.json();
+          favMovies.push(data);
+        }
+        setVideos(favMovies);
+      } else if (filter === "movie" || (filter === "series" && year)) {
         const res = await fetch(
           `https://www.omdbapi.com/?s=${search}&page=${page}&type=${filter}&y=${year}&apikey=b00bdafe`
         );
@@ -60,10 +72,11 @@ export default function Body({ filter, search }) {
       }
     }
     fetchMovies();
-  }, [filter, year, search, page]);
+  }, [filter, year, search, page, favOpen, favourite]);
 
   async function fetchMovieDetails(id) {
     setSelectSeason(null);
+    setRating(0);
     setSeasons([]);
     const res = await fetch(`http://www.omdbapi.com/?i=${id}&apikey=b00bdafe`);
     const data = await res.json();
@@ -89,9 +102,55 @@ export default function Body({ filter, search }) {
   }
 
   return (
+    <>
+      {
+        <Home
+          selectedItem={selectedItem}
+          seasons={seasons}
+          fetchSeasonSeries={fetchSeasonSeries}
+          selectedSeason={selectedSeason}
+          fetchEpisodeDetails={fetchEpisodeDetails}
+          selectedepisode={selectedepisode}
+          stars={stars}
+          setRating={setRating}
+          rating={rating}
+          setPage={setPage}
+          videos={videos}
+          fetchMovieDetails={fetchMovieDetails}
+          setYear={setYear}
+          years={years}
+          favourite={favourite}
+          setFavourite={setFavourite}
+          favOpen={favOpen}
+        />
+      }
+    </>
+  );
+}
+
+function Home({
+  setYear,
+  years,
+  videos,
+  fetchMovieDetails,
+  setPage,
+  selectedItem,
+  seasons,
+  fetchSeasonSeries,
+  selectedSeason,
+  fetchEpisodeDetails,
+  selectedepisode,
+  stars,
+  setRating,
+  rating,
+  favourite,
+  setFavourite,
+  favOpen,
+}) {
+  return (
     <main>
       <section>
-        <YearFilter setYear={setYear} years={years} />
+        <YearFilter setYear={setYear} years={years} favOpen={favOpen} />
         <MovieList videos={videos} fetchMovieDetails={fetchMovieDetails} />
 
         <Paginations setPage={setPage} />
@@ -107,6 +166,8 @@ export default function Body({ filter, search }) {
           stars={stars}
           setRating={setRating}
           rating={rating}
+          setFavourite={setFavourite}
+          favourite={favourite}
         />
       </section>
     </main>
@@ -143,11 +204,11 @@ function MovieList({ videos, fetchMovieDetails }) {
     </>
   );
 }
-function YearFilter({ setYear, years }) {
+function YearFilter({ setYear, years, favOpen }) {
   return (
     <>
       <div className="filter-movie-container">
-        <h2>Movies List</h2>
+        {favOpen ? <h2>Favourite Movies List</h2> : <h2>Movies List</h2>}
 
         <div className="filter">
           <label for="year">Select Year:</label>
@@ -302,6 +363,8 @@ function MovieDetails({
   selectedSeason,
   fetchEpisodeDetails,
   selectedepisode,
+  favourite,
+  setFavourite,
 }) {
   return (
     <>
@@ -316,7 +379,27 @@ function MovieDetails({
                 alt={`${selectedItem.Title} Poster`}
                 className="movie-detail-poster"
               />
-              <button className="add-to-favourite">Add to Favourites</button>
+              {favourite.includes(selectedItem.imdbID) ? (
+                <button
+                  className="add-to-favourite"
+                  onClick={() =>
+                    setFavourite(
+                      favourite.filter((id) => id !== selectedItem.imdbID)
+                    )
+                  }
+                >
+                  Remove from Favouritem
+                </button>
+              ) : (
+                <button
+                  className="add-to-favourite"
+                  onClick={() =>
+                    setFavourite(() => [...favourite, selectedItem.imdbID])
+                  }
+                >
+                  Add to Favouritem
+                </button>
+              )}
             </div>
             <div className="movie-info">
               <h3>{selectedItem.Title}</h3>
@@ -337,6 +420,9 @@ function MovieDetails({
               </p>
               <p>
                 <b>IMDB Rating:</b> {selectedItem.imdbRating || "N/A"}
+              </p>
+              <p>
+                <b>IMDB Rating:</b> {selectedItem.imdbID || "N/A"}
               </p>
               <p>
                 <b>Your Rating:</b>

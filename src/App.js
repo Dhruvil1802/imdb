@@ -7,10 +7,18 @@ function App() {
   const [filter, setFilter] = useState("");
   const [search, setSearch] = useState("");
 
+  const [favOpen, setFavOpen] = useState(false);
+
+  console.log(favOpen);
+
   return (
     <div>
-      <Header setFilter={setFilter} setSearch={setSearch}></Header>
-      <Body filter={filter} search={search}></Body>
+      <Header
+        setFilter={setFilter}
+        setSearch={setSearch}
+        setFavOpen={setFavOpen}
+      ></Header>
+      <Body filter={filter} search={search} favOpen={favOpen}></Body>
     </div>
   );
 }
