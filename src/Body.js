@@ -10,7 +10,11 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
   const [page, setPage] = useState(1);
   const [rating, setRating] = useState(0);
   const [selectedepisode, setselectEpisode] = useState(null);
-  const [favourite, setFavourite] = useState([]);
+
+  const stored_favourite = JSON.parse(localStorage.getItem(`favourites`))
+    ? JSON.parse(localStorage.getItem(`favourites`))
+    : [];
+  const [favourite, setFavourite] = useState(stored_favourite);
 
   var years = [];
   var stars = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -35,7 +39,6 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
   useEffect(() => {
     async function fetchMovies() {
       if (favOpen) {
-        console.log("favopen", favOpen);
         const favMovies = [];
         for (let i = 0; i < favourite.length; i++) {
           const res = await fetch(
@@ -76,7 +79,7 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
 
   async function fetchMovieDetails(id) {
     setSelectSeason(null);
-    setRating(0);
+
     setSeasons([]);
     const res = await fetch(`http://www.omdbapi.com/?i=${id}&apikey=b00bdafe`);
     const data = await res.json();
@@ -366,11 +369,48 @@ function MovieDetails({
   favourite,
   setFavourite,
 }) {
+  useEffect(
+    function () {
+      async function saveFavourite() {
+        localStorage.setItem(`favourites`, JSON.stringify([...favourite]));
+      }
+      saveFavourite();
+    },
+    [favourite]
+  );
+  useEffect(
+    function () {
+      async function saveRating() {
+        selectedItem &&
+          localStorage.setItem(
+            `${selectedItem.imdbID}_rating`,
+            JSON.stringify(rating)
+          );
+      }
+      saveRating();
+    },
+    [rating]
+  );
+  useEffect(
+    function () {
+      async function getRating() {
+        const saved_rating =
+          selectedItem &&
+          selectedItem.imdbID &&
+          JSON.parse(localStorage.getItem(`${selectedItem.imdbID}_rating`))
+            ? JSON.parse(localStorage.getItem(`${selectedItem.imdbID}_rating`))
+            : 0;
+        setRating(saved_rating);
+      }
+      getRating();
+    },
+    [selectedItem]
+  );
   return (
     <>
       <h2>Movie Details</h2>
 
-      {selectedItem ? (
+      {selectedItem && selectedItem ? (
         <div className="movie-details-container">
           <div className="movie-header">
             <div className="movie-left">
@@ -388,7 +428,7 @@ function MovieDetails({
                     )
                   }
                 >
-                  Remove from Favouritem
+                  Remove from Favourite
                 </button>
               ) : (
                 <button
@@ -397,7 +437,7 @@ function MovieDetails({
                     setFavourite(() => [...favourite, selectedItem.imdbID])
                   }
                 >
-                  Add to Favouritem
+                  Add to Favourite
                 </button>
               )}
             </div>
@@ -427,8 +467,8 @@ function MovieDetails({
               <p>
                 <b>Your Rating:</b>
                 {stars.map((i) => (
-                  <span className="star" onClick={() => setRating(i + 1)}>
-                    {i < rating ? "★" : "☆"}
+                  <span className="star" onClick={() => setRating(i)}>
+                    {i <= rating ? "★" : "☆"}
                   </span>
                 ))}
               </p>
