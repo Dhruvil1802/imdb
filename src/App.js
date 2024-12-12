@@ -5,11 +5,9 @@ import Body from "./Body";
 
 function App() {
   const [filter, setFilter] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("game");
 
   const [favOpen, setFavOpen] = useState(false);
-
-  console.log(favOpen);
 
   return (
     <div>

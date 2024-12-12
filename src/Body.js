@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./body.css";
 
-export default function Body({ filter, search, favOpen, homeOpen }) {
+export default function Body({ filter, search, favOpen }) {
   const [videos, setVideos] = useState("");
   const [year, setYear] = useState("");
   const [selectedItem, setSelectItem] = useState(null);
@@ -11,6 +11,7 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
   const [rating, setRating] = useState(0);
   const [selectedepisode, setselectEpisode] = useState(null);
 
+  // fetch favourite shows from the local storage
   const stored_favourite = JSON.parse(localStorage.getItem(`favourites`))
     ? JSON.parse(localStorage.getItem(`favourites`))
     : [];
@@ -22,6 +23,7 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
     years.push(i);
   }
 
+  // create array of all the seasons of particular webseries whenever user selects item
   useEffect(() => {
     async function createSeasonArray() {
       const newSeasons = [];
@@ -36,6 +38,7 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
     createSeasonArray();
   }, [selectedItem]);
 
+  // fetch shows based on filter, year, search, page, favourites
   useEffect(() => {
     async function fetchMovies() {
       if (favOpen) {
@@ -77,6 +80,7 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
     fetchMovies();
   }, [filter, year, search, page, favOpen, favourite]);
 
+  // fetch details of shows
   async function fetchMovieDetails(id) {
     setSelectSeason(null);
 
@@ -87,6 +91,7 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
     setSelectItem(data);
   }
 
+  // fetch details of season when user clicks on series
   async function fetchSeasonSeries(id, season) {
     const res = await fetch(
       `https://www.omdbapi.com/?i=${id}&Season=${season}&apikey=b00bdafe`
@@ -95,6 +100,8 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
 
     setSelectSeason(data);
   }
+
+  // fetch details of episode  when user clicks on specific episode
   async function fetchEpisodeDetails(season, episode, title) {
     const res = await fetch(
       `https://www.omdbapi.com/?t=${title}&Season=${season}&Episode=${episode.Episode}&apikey=b00bdafe`
@@ -104,52 +111,6 @@ export default function Body({ filter, search, favOpen, homeOpen }) {
     setselectEpisode(data);
   }
 
-  return (
-    <>
-      {
-        <Home
-          selectedItem={selectedItem}
-          seasons={seasons}
-          fetchSeasonSeries={fetchSeasonSeries}
-          selectedSeason={selectedSeason}
-          fetchEpisodeDetails={fetchEpisodeDetails}
-          selectedepisode={selectedepisode}
-          stars={stars}
-          setRating={setRating}
-          rating={rating}
-          setPage={setPage}
-          videos={videos}
-          fetchMovieDetails={fetchMovieDetails}
-          setYear={setYear}
-          years={years}
-          favourite={favourite}
-          setFavourite={setFavourite}
-          favOpen={favOpen}
-        />
-      }
-    </>
-  );
-}
-
-function Home({
-  setYear,
-  years,
-  videos,
-  fetchMovieDetails,
-  setPage,
-  selectedItem,
-  seasons,
-  fetchSeasonSeries,
-  selectedSeason,
-  fetchEpisodeDetails,
-  selectedepisode,
-  stars,
-  setRating,
-  rating,
-  favourite,
-  setFavourite,
-  favOpen,
-}) {
   return (
     <main>
       <section>
@@ -176,6 +137,7 @@ function Home({
     </main>
   );
 }
+
 function MovieList({ videos, fetchMovieDetails }) {
   return (
     <>
@@ -230,7 +192,9 @@ function Paginations({ setPage }) {
   return (
     <>
       <div>
-        <button onClick={() => setPage((page) => page - 1)}>Previous</button>
+        <button onClick={() => setPage((page) => (page > 1 ? page - 1 : page))}>
+          Previous
+        </button>
 
         <button onClick={() => setPage((page) => page + 1)}>Next</button>
       </div>
@@ -318,6 +282,7 @@ function SeasonList({
 }) {
   return (
     <>
+      {/* display seasons of webseries */}
       {selectedItem.Type === "series" ? (
         <div className="seasons-container">
           <h3>Seasons</h3>
@@ -369,6 +334,7 @@ function MovieDetails({
   favourite,
   setFavourite,
 }) {
+  // save favourite in local storage when user click on add to favourite button
   useEffect(
     function () {
       async function saveFavourite() {
@@ -378,6 +344,8 @@ function MovieDetails({
     },
     [favourite]
   );
+
+  // save rating with its movie id in local storage when user rate movie
   useEffect(
     function () {
       async function saveRating() {
@@ -391,6 +359,8 @@ function MovieDetails({
     },
     [rating]
   );
+
+  // fetch rating when user selects any show if he previously rated that show
   useEffect(
     function () {
       async function getRating() {
@@ -408,6 +378,7 @@ function MovieDetails({
   );
   return (
     <>
+      {/* display movie details */}
       <h2>Movie Details</h2>
 
       {selectedItem && selectedItem ? (
@@ -459,11 +430,18 @@ function MovieDetails({
                 <b>Plot:</b> {selectedItem.Plot || "N/A"}
               </p>
               <p>
-                <b>IMDB Rating:</b> {selectedItem.imdbRating || "N/A"}
+                <b>voters:</b> {selectedItem.imdbVotes || "N/A"}
               </p>
               <p>
-                <b>IMDB Rating:</b> {selectedItem.imdbID || "N/A"}
+                <b>IMDB Rating:</b>{" "}
+                {rating === 0
+                  ? selectedItem.imdbRating
+                  : (Number(selectedItem.imdbRating) *
+                      Number(selectedItem.imdbVotes) +
+                      Number(rating)) /
+                      (Number(selectedItem.imdbVotes) + 1) || "N/A"}
               </p>
+
               <p>
                 <b>Your Rating:</b>
                 {stars.map((i) => (
